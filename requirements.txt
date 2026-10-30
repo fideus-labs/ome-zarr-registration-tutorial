@@ -1,0 +1,10 @@
+# The registration, its presets and its command line
+impact-reg-konfai>=1.8.8
+# ConvexAdam's itk-impact is built against this torch; it has no wheel for macOS
+torch==2.12.*; sys_platform != "darwin"
+# Reading, writing and applying OME-Zarr transformations
+ngff-zarr[itk]>=0.50.1
+itk-io
+# Reading the data straight from Zenodo, and the pictures
+fsspec[http]
+pillow
