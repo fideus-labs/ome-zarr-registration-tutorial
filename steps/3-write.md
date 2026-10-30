@@ -1,6 +1,7 @@
-# Step 3. Write
+# Step 3. Write, and read back
 
-**Goal:** write the registration as OME-Zarr: both images and the transformation between them, in one file.
+**Goal:** write the registration as OME-Zarr, both images and the transformation between them in one file, and check
+what a reader finds in it.
 
 ## Run it
 
@@ -31,20 +32,30 @@ pair.ozx                 43 MB
 - **It says what it connects:** from the coordinate system of `fixed` to the one of `moving`.
 - **It is in the images' own unit,** here micrometers, in the axis order z, y, x.
 
-Look at it, in `zarr.json`:
+## Read it back
 
 ```bash
-unzip -p output/pair.ozx zarr.json | python -c "import json, sys; print(json.dumps(json.load(sys.stdin)['attributes']['ome']['scene'], indent=1))"
+python steps/read_scene.py
 ```
+
+```text
+fixed: 50 x 680 x 535 voxels, 3 levels
+moving: 50 x 680 x 535 voxels, 3 levels
+transformation: affine, from fixed to moving
+[[  1.    -0.01   0.02   0.47]
+ [  0.01   1.     0.   -10.02]
+ [ -0.02  -0.     1.    36.83]]
+```
+
+Nothing is computed: this is the file's metadata, read by ngff-zarr through
+[`NgffScene.from_ome_zarr`](read_scene.py). Any OME-Zarr 0.6 reader finds the same thing in `zarr.json`:
 
 ```json
 {"coordinateTransformations": [{
   "type": "affine",
   "input":  {"path": "fixed",  "name": "intrinsic"},
   "output": {"path": "moving", "name": "intrinsic"},
-  "affine": [[ 0.9997, -0.0101,  0.0242,   0.47],
-             [ 0.0101,  0.9999,  0.0015, -10.02],
-             [-0.0242, -0.0012,  0.9997,  36.83]]}]}
+  "affine": [[...], [...], [...]]}]}
 ```
 
 The last column reads directly: between the two rounds, the organoid moved 37 µm along x and 10 µm along y.

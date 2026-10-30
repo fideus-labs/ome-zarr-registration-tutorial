@@ -52,4 +52,4 @@ further from each other.
 The scores come from [step 4](4-apply.md): `python steps/apply.py your_scene.ozx`. Correlation starts at -0.06, and the
 overlap at 0.
 
-**Next: [Step 3. Write](3-write.md)**
+**Next: [Step 3. Write, and read back](3-write.md)**

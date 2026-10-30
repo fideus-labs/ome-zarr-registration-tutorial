@@ -17,7 +17,7 @@ By the end of this tutorial, you will have:
 
 1. **read** OME-Zarr images from a public archive, loading only what you ask for;
 2. **registered** them with one command, on a laptop, without a GPU;
-3. **written** the result as an RFC-5 transformation, in one OME-Zarr 0.6 file;
+3. **written** the result as an RFC-5 transformation, in one OME-Zarr 0.6 file, and read it back;
 4. **applied** it lazily to the image and to its labels, without writing a resampled copy.
 
 It takes about 30 minutes, of which 2 of computing.
@@ -28,7 +28,7 @@ It takes about 30 minutes, of which 2 of computing.
 |---|---|---|---|
 | **[1. Read](steps/1-read.md)** | Opens two rounds of an organoid, straight from Zenodo | ngff-zarr | `R0.ome.zarr`, `R1.ome.zarr` |
 | **[2. Register](steps/2-register.md)** | Aligns R1 onto R0, with one command | IMPACT-Reg | `Transform.h5`, `Moved.ome.zarr` |
-| **[3. Write](steps/3-write.md)** | Puts both images and the transformation in one scene | IMPACT-Reg, ngff-zarr | `pair.ozx` |
+| **[3. Write, and read back](steps/3-write.md)** | Puts both images and the transformation in one scene, and checks what a reader finds | IMPACT-Reg, ngff-zarr | `pair.ozx` |
 | **[4. Apply](steps/4-apply.md)** | Applies it to the image and the nuclei, lazily | ngff-zarr | nuclei overlap: 0 → 0.91 |
 
 Prefer to watch first? **[The four steps in one minute](media/videos/tutorial.mp4)** (video, no sound).
