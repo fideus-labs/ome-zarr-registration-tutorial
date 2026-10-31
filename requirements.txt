@@ -4,7 +4,6 @@ impact-reg-konfai>=1.8.8
 torch==2.12.*; sys_platform != "darwin"
 # Reading, writing and applying OME-Zarr transformations
 ngff-zarr[itk]>=0.51
-itk-io
 # Reading the data straight from Zenodo, and the pictures
 fsspec[http]
 pillow
