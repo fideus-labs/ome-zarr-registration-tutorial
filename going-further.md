@@ -24,16 +24,15 @@ What to check first:
 
 ## 2-D images
 
-`register` takes single-channel 2-D images too, as OME-Zarr or as files, and gives back a 2-D transformation and a 2-D
-moved image. In 2-D the transformation stays in ITK's `Transform.h5`: leave out the `--set`, which is refused there, and
-`write.py` does not apply. On the middle plane of this organoid, on a GPU:
+The same commands take single-channel 2-D images: `register` gives back a 2-D RFC-5 field and a 2-D moved image, and
+`write.py` and `apply.py` work on them. On the middle plane of this organoid:
 
 | Preset | Correlation (-0.06 before) | Time |
 |---|---|---|
-| `ConvexAdam_Composite` | 0.99 | 33 s |
-| `FireANTs_SyN` | 0.97 | 28 s |
-| `Generic_Rigid` | 0.90 | 10 s |
-| `Generic_Rigid_BSpline` | 0.89 | 15 s |
+| `ConvexAdam_Composite` | 0.99 | 28 s, GPU |
+| `FireANTs_SyN` | 0.97 | 15 s, GPU |
+| `Generic_Rigid` | 0.90 | 11 s, CPU |
+| `Generic_Rigid_BSpline` | 0.89 | 10 s, CPU |
 
 ## Larger images
 

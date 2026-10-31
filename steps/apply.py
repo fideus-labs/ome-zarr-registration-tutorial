@@ -19,11 +19,11 @@ print(f"The scene holds an RFC-5 '{transformation.type}' from {transformation.in
 # Lazy: this describes the result, block by block. Nothing is read or computed yet.
 moved = nz.resample(transformation, fixed, moving, fields=fields)
 
-# One plane is computed, reading only the part of the moving image it needs.
-z = fixed.data.shape[0] // 2
-fixed_plane, moved_plane = np.asarray(fixed.data[z]), np.asarray(moved.data[z])
+# One plane is computed (a 2-D image is one), reading only the part of the moving image it needs.
+plane = (fixed.data.shape[0] // 2,) if fixed.data.ndim == 3 else ()
+fixed_plane, moved_plane = np.asarray(fixed.data[plane]), np.asarray(moved.data[plane])
 overlay(fixed_plane, moved_plane, "output/after.png")
-print(f"Correlation with the fixed image, on one plane: {ncc(fixed_plane, np.asarray(moving.data[z])):.2f} -> {ncc(fixed_plane, moved_plane):.2f}")
+print(f"Correlation with the fixed image, on one plane: {ncc(fixed_plane, np.asarray(moving.data[plane])):.2f} -> {ncc(fixed_plane, moved_plane):.2f}")
 print("After registration: output/after.png")
 
 # The same transformation carries everything else on the moving side: the nuclei of step 1, on a scene of that pair.

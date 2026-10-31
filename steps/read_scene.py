@@ -19,5 +19,6 @@ print(f"transformation: {transformation.type}, from {transformation.input.path} 
 field = nz.from_ome_zarr(f"{SCENE}/{transformation.path}").images[0]
 print(f"its field: {transformation.path}, {' x '.join(str(extent) for extent in field.data.shape)}")
 centre = tuple(extent // 2 for extent in field.data.shape[1:])
-dz, dy, dx = np.asarray(field.data[(slice(None), *centre)])
-print(f"at the centre of the image: dz {dz:.1f}, dy {dy:.1f}, dx {dx:.1f} {field.axes_units['x']}s")
+vector = np.asarray(field.data[(slice(None), *centre)])
+moves = ", ".join(f"d{axis} {value:.1f}" for axis, value in zip(field.dims[1:], vector))
+print(f"at the centre of the image: {moves} {field.axes_units['x']}s")
