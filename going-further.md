@@ -5,7 +5,7 @@
 Any two images that should line up: two time points, two rounds, two samples, two modalities.
 
 ```bash
-impact-reg-konfai register Generic_Rigid -f fixed.ome.zarr -m moving.ome.zarr -o output/mine --cpu 4 \
+impact-reg-konfai register Generic_Rigid -f fixed.ome.zarr -m moving.ome.zarr -o output/mine --cpu 1 \
     --set Predictor.outputs_dataset.DisplacementField.OutputDataset.dataset_filename=Transform:omezarr
 python steps/write.py fixed.ome.zarr moving.ome.zarr output/mine/P000/Transform.ome.zarr output/mine.ozx
 python steps/apply.py output/mine.ozx

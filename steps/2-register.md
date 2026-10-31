@@ -6,16 +6,16 @@
 
 ```bash
 impact-reg-konfai register Generic_Rigid \
-    -f output/R0.ome.zarr -m output/R1.ome.zarr -o output/registration --cpu 4 \
+    -f output/R0.ome.zarr -m output/R1.ome.zarr -o output/registration --cpu 1 \
     --set Predictor.outputs_dataset.DisplacementField.OutputDataset.dataset_filename=Transform:omezarr
 ```
 
-With a GPU, replace `--cpu 4` by `--gpu 0`.
+With a GPU, replace `--cpu 1` by `--gpu 0`.
 
 ## What you should see
 
 ```text
-[ImpactReg] Registration completed in 13 s
+[ImpactReg] Registration completed in 11 s
   Preset:    Generic_Rigid (Generic Rigid)
   Transform: output/registration/P000/Transform.ome.zarr
   Moved:     output/registration/P000/Moved.ome.zarr
@@ -44,8 +44,8 @@ does and what it needs.
 
 | Preset | Engine | Time on this pair | Correlation | Nuclei overlap | Runs on |
 |---|---|---|---|---|---|
-| `Generic_Rigid` | elastix, rigid | 13 s, CPU | 0.89 | 0.91 | any machine |
-| `Generic_Rigid_BSpline` | elastix, rigid then B-spline | 1 min 20, CPU | 0.89 | 0.78 | any machine |
+| `Generic_Rigid` | elastix, rigid | 11 s, CPU | 0.89 | 0.91 | any machine |
+| `Generic_Rigid_BSpline` | elastix, rigid then B-spline | 1 min 15, CPU | 0.89 | 0.78 | any machine |
 | `ConvexAdam_Composite` | ConvexAdam on MIND features | 36 s, GPU | 0.99 | 0.94 | Linux and Windows, no macOS package |
 | `FireANTs_SyN` | FireANTs, diffeomorphic | 3 min 42, GPU | 0.99 | 0.94 | a GPU: over 50 min on a CPU |
 
