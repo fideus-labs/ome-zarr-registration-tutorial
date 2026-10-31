@@ -38,7 +38,7 @@ multiscales = nz.from_ngff_zarr(archive.get_mapper("220605_151046.zarr/C/02/0"))
 plane = multiscales.images[2].data[0, 25]  # level 2, channel 0, plane 25: not read yet
 ```
 
-The script then keeps a local copy of both images and of their nuclei, because the registration of step 2 reads local
-stores.
+The script then keeps a local copy of both images, their DAPI channel alone, and of their nuclei, because the
+registration of step 2 reads local stores of one channel.
 
 **Next: [Step 2. Register](2-register.md)**

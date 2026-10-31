@@ -1,36 +1,57 @@
 # Step 3. Write, and read back
 
-**Goal:** write the registration as OME-Zarr, both images and the transformation between them in one file, and check
+**Goal:** with ngff-zarr alone, write both images and the transformation between them in one OME-Zarr 0.6 file, and check
 what a reader finds in it.
 
 ## Run it
 
 ```bash
-impact-reg-konfai scene --transform output/registration/P000/Transform.h5 \
-    -f output/R0.ome.zarr -m output/R1.ome.zarr -o output/pair.ozx
+python steps/write.py
 ```
 
 ## What you should see
 
 ```text
-[ImpactReg] scene output/pair.ozx (affine)
+Scene: output/pair.ozx
 ```
 
 `pair.ozx` is one file, a zipped OME-Zarr 0.6 store (RFC-9):
 
 ```text
-pair.ozx                 43 MB
-├── zarr.json            the scene, and the transformation
-├── fixed/               R0, with its pyramid
-└── moving/              R1, with its pyramid
+pair.ozx                        135 MB
+├── zarr.json                   the scene: what the transformation connects
+├── fixed/                      R0, with its pyramid
+├── moving/                     R1, with its pyramid
+└── coordinateTransformations/
+    └── registration/           the field of step 2
 ```
 
 ## What just happened
 
-- **The transformation is now metadata (RFC-5).** A rigid result is an affine: 12 numbers, in place of the 437 MB of
-  `Transform.h5`.
-- **It says what it connects:** from the coordinate system of `fixed` to the one of `moving`.
-- **It is in the images' own unit,** here micrometers, in the axis order z, y, x.
+- **The transformation was OME-Zarr already.** Step 2 wrote it as an RFC-5 `displacements` field. It is copied as it
+  is: an ordinary OME-Zarr image, whose first axis holds the components (dz, dy, dx), in micrometers.
+- **The scene says what it connects:** from the coordinate system of `fixed` to the one of `moving`.
+- **No registration tool is needed from here on.** This step and the next one only use ngff-zarr.
+
+The part that matters in [`write.py`](write.py):
+
+```python
+# The transformation is an OME-Zarr image already: it goes below the scene, first.
+nz.to_ome_zarr(f"{STORE}/{FIELD}", nz.from_ome_zarr(TRANSFORM), version="0.6")
+
+# The scene names what it connects: from the coordinates of the fixed image to those of the moving one.
+registration = Displacements(
+    path=FIELD,
+    interpolation="linear",
+    input=CoordinateSystemIdentifier(path="fixed", name="intrinsic"),
+    output=CoordinateSystemIdentifier(path="moving", name="intrinsic"),
+)
+images = {"fixed": nz.from_ome_zarr(FIXED), "moving": nz.from_ome_zarr(MOVING)}
+NgffScene(images=images, coordinateTransformations=[registration]).to_ome_zarr(STORE, overwrite=False)
+
+# One file: the same store, zipped (RFC-9).
+nz.write_store_to_zip(STORE, SCENE, version="0.6")
+```
 
 ## Read it back
 
@@ -41,33 +62,33 @@ python steps/read_scene.py
 ```text
 fixed: 50 x 680 x 535 voxels, 3 levels
 moving: 50 x 680 x 535 voxels, 3 levels
-transformation: affine, from fixed to moving
-[[  1.    -0.01   0.02   0.47]
- [  0.01   1.     0.   -10.02]
- [ -0.02  -0.     1.    36.83]]
+transformation: displacements, from fixed to moving
+its field: coordinateTransformations/registration, 3 x 50 x 680 x 535
+at the centre of the image: dz 1.1, dy -9.8, dx 36.4 micrometers
 ```
 
-Nothing is computed: this is the file's metadata, read by ngff-zarr through
-[`NgffScene.from_ome_zarr`](read_scene.py). Any OME-Zarr 0.6 reader finds the same thing in `zarr.json`:
+This is the file's metadata, read by ngff-zarr through [`NgffScene.from_ome_zarr`](read_scene.py), plus one vector of
+the field. Any OME-Zarr 0.6 reader finds the same thing in `zarr.json`:
 
 ```json
-{"coordinateTransformations": [{
-  "type": "affine",
+{"scene": {"coordinateTransformations": [{
+  "type": "displacements",
+  "path": "coordinateTransformations/registration",
+  "interpolation": "linear",
   "input":  {"path": "fixed",  "name": "intrinsic"},
-  "output": {"path": "moving", "name": "intrinsic"},
-  "affine": [[...], [...], [...]]}]}
+  "output": {"path": "moving", "name": "intrinsic"}}]}}
 ```
 
-The last column reads directly: between the two rounds, the organoid moved 37 µm along x and 10 µm along y.
+The last line of the output reads directly: between the two rounds, the centre of the organoid moved 36 µm along x and
+10 µm along y.
 
-## A deformable result
+## The size of the transformation
 
-A deformable preset gives an RFC-5 `displacements` field, stored beside the images as float32. It need not be as fine
-as the image: `--factor` stores it that many times coarser. With `ConvexAdam_Composite` on this pair:
+| Preset | `Transform.h5` | `Transform.ome.zarr` | `pair.ozx` |
+|---|---|---|---|
+| `Generic_Rigid` | 437 MB | 90 MB | 135 MB |
+| `ConvexAdam_Composite` | 437 MB | 170 MB | 218 MB |
 
-| `--factor` | `pair.ozx` | Nuclei overlap (Dice) |
-|---|---|---|
-| 1 | 223 MB | 0.94 |
-| 4 | 46 MB | 0.94 |
+The field is stored as float32, on the fixed image's grid.
 
 **Next: [Step 4. Apply](4-apply.md)**

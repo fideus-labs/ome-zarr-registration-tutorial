@@ -25,9 +25,17 @@ fixed_plane, moving_plane = (np.asarray(rounds[name].images[2].data[0, 25]) for 
 overlay(fixed_plane, moving_plane, "output/before.png")
 print("Before registration: output/before.png")
 
-# The registration reads local stores: a copy of the images, and of their nuclei for step 4.
+# The registration reads local stores: a copy of the images, one channel each, and of their nuclei for step 4.
 for name, i in (("R0", 0), ("R1", 1)):
-    nz.to_ngff_zarr(f"output/{name}.ome.zarr", rounds[name], version="0.5")
+    image = rounds[name].images[0]
+    dapi = nz.NgffImage(
+        data=image.data[0].persist(),  # 36 MB, read once: the pyramid is computed from it
+        dims=["z", "y", "x"],
+        scale={axis: image.scale[axis] for axis in "zyx"},
+        translation={axis: image.translation[axis] for axis in "zyx"},
+        axes_units={axis: image.axes_units[axis] for axis in "zyx"},
+    )
+    nz.to_ngff_zarr(f"output/{name}.ome.zarr", nz.to_multiscales(dapi), version="0.5")
     nuclei = nz.from_ngff_zarr(archive.get_mapper(f"{WELL}/{i}/labels/nuc"))
     nz.to_ngff_zarr(f"output/{name}_nuclei.ome.zarr", nuclei, version="0.5")
 print("Local stores: output/R0.ome.zarr, output/R1.ome.zarr")

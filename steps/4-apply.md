@@ -11,7 +11,7 @@ python steps/apply.py
 ## What you should see
 
 ```text
-The scene holds an RFC-5 'affine' from fixed to moving
+The scene holds an RFC-5 'displacements' from fixed to moving
 Correlation with the fixed image, on one plane: -0.06 -> 0.89
 After registration: output/after.png
 Overlap of the nuclei (Dice): 0.00 -> 0.91
@@ -36,13 +36,12 @@ The part that matters in [`apply.py`](apply.py):
 scene = nz.NgffScene.from_ome_zarr("output/pair.ozx")
 transformation = scene.coordinateTransformations[0]
 fixed, moving = scene.images["fixed"].images[0], scene.images["moving"].images[0]
+fields = {transformation.path: nz.from_ome_zarr(f"output/pair.ozx/{transformation.path}")}
 
-moved = nz.resample(transformation, fixed, moving)  # lazy
-plane = moved.data[25].compute()                    # reads what this plane needs
-nuclei = nz.resample(transformation, fixed, labels, interpolator="label_image")
+moved = nz.resample(transformation, fixed, moving, fields=fields)  # lazy
+plane = moved.data[25].compute()                                   # reads what this plane needs
+nuclei = nz.resample(transformation, fixed, labels, interpolator="label_image", fields=fields)
 ```
-
-A deformable scene also passes its field: `fields={path: nz.from_ome_zarr(f"{scene}/{path}")}`. `apply.py` does both.
 
 ## Map points
 
@@ -55,7 +54,7 @@ ngff-zarr transform-points output/pair.ozx output/points.json
 ```
 
 ```text
-{"dims": ["z", "y", "x"], "points": [[16.13, 63.21, 94.36]]}
+{"dims": ["z", "y", "x"], "points": [[16.133347052794235, 63.21137061485877, 94.35804240661261]]}
 ```
 
 ## You are done

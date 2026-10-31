@@ -10,10 +10,11 @@ python demo/read_idr0044.py "$FIXED" "$LEVEL" "$F"
 python demo/read_idr0044.py "$MOVING" "$LEVEL" "$M"
 
 # 2. Register
-impact-reg-konfai register ConvexAdam_Composite -f "$F" -m "$M" -o $OUT/registration --gpu "${GPU-0}"
+impact-reg-konfai register ConvexAdam_Composite -f "$F" -m "$M" -o $OUT/registration --gpu "${GPU-0}" \
+    --set Predictor.outputs_dataset.DisplacementField.OutputDataset.dataset_filename=Transform:omezarr
 
-# 3. Write, the field 4 times coarser than the image
-impact-reg-konfai scene --transform $OUT/registration/P000/Transform.h5 -f "$F" -m "$M" -o $OUT/pair.ozx --factor 4
+# 3. Write
+python steps/write.py "$F" "$M" $OUT/registration/P000/Transform.ome.zarr $OUT/pair.ozx
 
 # 4. Apply
 python steps/apply.py $OUT/pair.ozx

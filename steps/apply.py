@@ -13,8 +13,7 @@ scene = nz.NgffScene.from_ome_zarr(SCENE)
 transformation = scene.coordinateTransformations[0]
 fixed = scene.images["fixed"].images[0]
 moving = scene.images["moving"].images[0]
-path = getattr(transformation, "path", None)  # a field is stored beside the images; an affine is its 12 numbers
-fields = {path: nz.from_ome_zarr(f"{SCENE}/{path}")} if path else {}
+fields = {transformation.path: nz.from_ome_zarr(f"{SCENE}/{transformation.path}")}
 print(f"The scene holds an RFC-5 '{transformation.type}' from {transformation.input.path} to {transformation.output.path}")
 
 # Lazy: this describes the result, block by block. Nothing is read or computed yet.
