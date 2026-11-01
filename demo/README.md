@@ -11,8 +11,8 @@ bash demo/run.sh          # level 3 (69 million voxels) of time points 150 and 2
 | Step | Result, on a laptop GPU |
 |---|---|
 | Read | about 12 s per time point |
-| Register (`ConvexAdam_Composite`) | 2 min 15 s, correlation on the tissue 0.30 -> 0.70 |
-| Write | `pair.ozx`, 718 MB: the field takes 689 MB, against 1.6 GB for `Transform.h5` |
+| Register (`ConvexAdam_Composite`) | 2 min 20 s, correlation on the tissue 0.30 -> 0.70 |
+| Write | `pair.ozx`, 717 MB: the field takes 689 MB, against 1.6 GB for `Transform.h5` |
 | Apply | one plane computed, from `pair.ozx`, in about a second |
 
 The whole run takes about 3 minutes and 12 GB of memory. The score depends on the memory: under 22 GB, the coarse pass

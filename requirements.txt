@@ -7,3 +7,5 @@ ngff-zarr[itk]>=0.51
 # Reading the data straight from Zenodo, and the pictures
 fsspec[http]
 pillow
+# The notebooks
+jupyterlab

@@ -20,18 +20,21 @@ By the end of this tutorial, you will have:
 3. **written** the images and that RFC-5 transformation in one OME-Zarr 0.6 file, with ngff-zarr, and read it back;
 4. **applied** it lazily to the image and to its labels, without writing a resampled copy.
 
-It takes about 30 minutes, of which 2 of computing.
+It takes about 30 minutes, of which 3 of computing.
 
 ## The four steps
 
 | Step | What it does | With | You get |
 |---|---|---|---|
-| **[1. Read](steps/1-read.md)** | Opens two rounds of an organoid, straight from Zenodo | ngff-zarr | `R0.ome.zarr`, `R1.ome.zarr` |
-| **[2. Register](steps/2-register.md)** | Aligns R1 onto R0, with one command | IMPACT-Reg | `Transform.ome.zarr`, `Moved.ome.zarr` |
-| **[3. Write, and read back](steps/3-write.md)** | Puts both images and the transformation in one scene, and checks what a reader finds | ngff-zarr | `pair.ozx` |
-| **[4. Apply](steps/4-apply.md)** | Applies it to the image and the nuclei, lazily | ngff-zarr | nuclei overlap: 0 → 0.91 |
+| **[1. Read](steps/1-read.ipynb)** | Opens two rounds of an organoid, straight from Zenodo | ngff-zarr | `R0.ome.zarr`, `R1.ome.zarr` |
+| **[2. Register](steps/2-register.ipynb)** | Aligns R1 onto R0, with one command | IMPACT-Reg | `Transform.ome.zarr`, `Moved.ome.zarr` |
+| **[3. Write, and read back](steps/3-write.ipynb)** | Puts both images and the transformation in one scene, and checks what a reader finds | ngff-zarr | `pair.ozx` |
+| **[4. Apply](steps/4-apply.ipynb)** | Applies it to the image and the nuclei, lazily | ngff-zarr | nuclei overlap: 0 → 0.92 |
 
-Prefer to watch first? **[The four steps in one minute](media/videos/tutorial.mp4)** (video, no sound).
+One notebook per step, each with its outputs saved: you can read them here before running anything.
+
+Step 2 is the only one that uses KonfAI. With a registration tool of your own, replace that step: steps 3 and 4 only need
+the path of an RFC-5 field in OME-Zarr.
 
 ## Install
 
@@ -43,9 +46,8 @@ git clone https://github.com/fideus-labs/ome-zarr-registration-tutorial
 cd ome-zarr-registration-tutorial
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+jupyter lab steps/1-read.ipynb
 ```
-
-Then start with **[Step 1. Read](steps/1-read.md)**.
 
 ## The data
 
