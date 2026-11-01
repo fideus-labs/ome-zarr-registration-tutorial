@@ -15,7 +15,7 @@ What to check first:
 
 | Your data | What to do |
 |---|---|
-| Several channels or time points | Register one image: write the channel or the time point to a store of its own, as [`read.py`](steps/read.py) does |
+| Several channels or time points | Register one image: write the channel or the time point to a store of its own, as [step 1](steps/1-read.ipynb) does |
 | On a server or in a zip | Copy or unzip it first: `register` reads local paths |
 | A TIFF or a NIfTI | Convert it first, with `ngff-zarr -i image.tif -o image.ome.zarr`: `write.py` reads OME-Zarr |
 | Units | Both images must declare theirs. A store in micrometers against a file whose numbers mean millimeters will not register |
@@ -29,10 +29,10 @@ The same commands take single-channel 2-D images: `register` gives back a 2-D RF
 
 | Preset | Correlation (-0.06 before) | Time |
 |---|---|---|
-| `ConvexAdam_Composite` | 0.99 | 28 s, GPU |
-| `FireANTs_SyN` | 0.97 | 15 s, GPU |
-| `Generic_Rigid` | 0.90 | 11 s, CPU |
-| `Generic_Rigid_BSpline` | 0.89 | 10 s, CPU |
+| `ConvexAdam_Composite` | 0.99 | 22 s, GPU |
+| `FireANTs_SyN` | 0.97 | 13 s, GPU |
+| `Generic_Rigid_BSpline` | 0.91 | 11 s, CPU |
+| `Generic_Rigid` | 0.90 | 9 s, CPU |
 
 ## Larger images
 
