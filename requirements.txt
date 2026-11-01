@@ -2,8 +2,8 @@
 impact-reg-konfai>=1.8.8
 # ConvexAdam's itk-impact is built against this torch; it has no wheel for macOS
 torch==2.12.*; sys_platform != "darwin"
-# Reading, writing and applying OME-Zarr transformations
-ngff-zarr[itk]>=0.51
+# Reading, writing and applying OME-Zarr transformations; remote: stores read over HTTP or S3 (the demo)
+ngff-zarr[itk,remote]>=0.51
 # Reading the data straight from Zenodo, and the pictures
 fsspec[http]
 pillow

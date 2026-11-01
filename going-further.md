@@ -5,11 +5,14 @@
 Any two images that should line up: two time points, two rounds, two samples, two modalities.
 
 ```bash
-impact-reg-konfai register Generic_Rigid -f fixed.ome.zarr -m moving.ome.zarr -o output/mine --cpu 1 \
+impact-reg-konfai register Generic_Rigid -f fixed.ome.zarr -m moving.ome.zarr -o output/mine --cpu 1 --fields-only \
     --set Predictor.outputs_dataset.DisplacementField.OutputDataset.dataset_filename=Transform:omezarr
 python steps/write.py fixed.ome.zarr moving.ome.zarr output/mine/P000/Transform.ome.zarr output/mine.ozx
 python steps/apply.py output/mine.ozx
 ```
+
+`write.py` takes the transformation in either RFC-5 form: the `affine` a linear preset writes, or the `displacements`
+field of a deformable one, which it copies below the scene.
 
 What to check first:
 
@@ -24,8 +27,9 @@ What to check first:
 
 ## 2-D images
 
-The same commands take single-channel 2-D images: `register` gives back a 2-D RFC-5 field and a 2-D moved image, and
-`write.py` and `apply.py` work on them. On the middle plane of this organoid:
+The same commands take single-channel 2-D images: `register` gives back a 2-D RFC-5 transformation (a 2 × 3 `affine`
+for `Generic_Rigid`, a field for the others) and a 2-D moved image, and `write.py` and `apply.py` work on them. On the
+middle plane of this organoid:
 
 | Preset | Correlation (-0.06 before) | Time |
 |---|---|---|

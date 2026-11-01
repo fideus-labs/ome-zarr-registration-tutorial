@@ -8,8 +8,8 @@
 
 Registering two images usually ends with a resampled copy of your data and a transform that only one tool can read.
 
-Here the result stays in OME-Zarr: the two images and the transformation between them, in one file, which any reader
-can apply when it needs to, without a copy.
+Here the result stays in OME-Zarr: the two images and the transformation between them, in one file, applied when a
+reader needs it, with no resampled copy of the data.
 
 ## Objectives
 
@@ -27,14 +27,14 @@ It takes about 30 minutes, of which 3 of computing.
 | Step | What it does | With | You get |
 |---|---|---|---|
 | **[1. Read](steps/1-read.ipynb)** | Opens two rounds of an organoid, straight from Zenodo | ngff-zarr | `R0.ome.zarr`, `R1.ome.zarr` |
-| **[2. Register](steps/2-register.ipynb)** | Aligns R1 onto R0, with one command | IMPACT-Reg | `Transform.ome.zarr`, `Moved.ome.zarr` |
+| **[2. Register](steps/2-register.ipynb)** | Aligns R1 onto R0, with one command | IMPACT-Reg | `Transform.ome.zarr`: an RFC-5 `affine`, twelve numbers |
 | **[3. Write, and read back](steps/3-write.ipynb)** | Puts both images and the transformation in one scene, and checks what a reader finds | ngff-zarr | `pair.ozx` |
 | **[4. Apply](steps/4-apply.ipynb)** | Applies it to the image and the nuclei, lazily | ngff-zarr | nuclei overlap: 0 → 0.92 |
 
 One notebook per step, each with its outputs saved: you can read them here before running anything.
 
 Step 2 is the only one that uses KonfAI. With a registration tool of your own, replace that step: steps 3 and 4 only need
-the path of an RFC-5 field in OME-Zarr.
+an RFC-5 transformation in OME-Zarr, an `affine` or a `displacements` field.
 
 ## Install
 
