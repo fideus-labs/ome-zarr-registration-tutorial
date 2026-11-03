@@ -1,32 +1,37 @@
-"""Step 3. Write the registration as one OME-Zarr 0.6 scene, with ngff-zarr alone."""
+"""Step 3. Write the registration as one OME-Zarr 0.6 scene, with ngff-zarr alone.
 
-import json
+    python steps/write.py FIXED MOVING TRANSFORM SCENE.ozx [--overwrite]
+
+The transformation is the one step 2 wrote: an RFC-5 ``affine`` or a ``displacements`` field, in OME-Zarr.
+"""
+
 import shutil
 import sys
+from pathlib import Path
 
 import ngff_zarr as nz
+from common import scene_transformation
 from ngff_zarr import CoordinateSystemIdentifier, NgffScene
-from ngff_zarr.v06.zarr_metadata import Displacements
 
-FIXED, MOVING, TRANSFORM, SCENE = sys.argv[1:] or (
-    "output/R0.ome.zarr",
-    "output/R1.ome.zarr",
+OVERWRITE = "--overwrite" in sys.argv
+FIXED, MOVING, TRANSFORM, SCENE = [argument for argument in sys.argv[1:] if argument != "--overwrite"] or (
+    "output/data/fixed.ome.zarr",
+    "output/data/moving.ome.zarr",
     "output/registration/P000/Transform.ome.zarr",
     "output/pair.ozx",
 )
 STORE = SCENE.removesuffix(".ozx") + ".ome.zarr"
-FIELD = "coordinateTransformations/registration"
-shutil.rmtree(STORE, ignore_errors=True)
 
-with open(f"{TRANSFORM}/zarr.json", encoding="utf-8") as file:
-    ome = json.load(file)["attributes"]["ome"]
-if "multiscales" in ome:
-    # A displacements field is an OME-Zarr image: it goes below the scene, first, and the scene points at it.
-    nz.to_ome_zarr(f"{STORE}/{FIELD}", nz.from_ome_zarr(TRANSFORM), version="0.6")
-    registration = Displacements(path=FIELD, interpolation="linear")
-else:
-    # An affine is metadata alone: the scene carries it.
-    registration = nz.from_ome_zarr(TRANSFORM, kind="transformation")
+for path in (FIXED, MOVING, TRANSFORM):
+    if not Path(path, "zarr.json").is_file():
+        sys.exit(f"{path}: not an OME-Zarr store (no zarr.json in it)")
+if Path(STORE).exists():
+    if not OVERWRITE:
+        sys.exit(f"{STORE} exists: pass --overwrite to replace it")
+    shutil.rmtree(STORE)
+
+# An affine goes into the scene's metadata; a displacements field is copied below the scene, and pointed at.
+registration = scene_transformation(TRANSFORM, STORE)
 
 # The scene names what it connects: from the coordinates of the fixed image to those of the moving one.
 registration.input = CoordinateSystemIdentifier(path="fixed", name="intrinsic")
@@ -36,4 +41,4 @@ NgffScene(images=images, coordinateTransformations=[registration]).to_ome_zarr(S
 
 # One file: the same store, zipped (RFC-9).
 nz.write_store_to_zip(STORE, SCENE, version="0.6")
-print(f"Scene: {SCENE}")
+print(f"Scene: {SCENE}, holding an RFC-5 '{registration.type}' from fixed to moving")

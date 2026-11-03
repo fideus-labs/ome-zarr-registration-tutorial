@@ -1,0 +1,15 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  rfc5:
+    # The RFC-5 round trips of tests/: ngff-zarr alone, synthetic images, no engine, no GPU, no download.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install "ngff-zarr[itk,validate]>=0.51" pillow pytest
+      - run: pytest -q tests

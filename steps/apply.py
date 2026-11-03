@@ -1,38 +1,50 @@
-"""Step 4. Apply the transformation, from the scene alone, without ever writing a resampled copy of the images."""
+"""Step 4. Apply the transformation from the scene alone, lazily, without writing a resampled copy of the images.
+
+    python steps/apply.py SCENE.ozx [FIXED_LABELS MOVING_LABELS]
+
+The labels are optional: two OME-Zarr label images on the two sides, carried through the same transformation.
+"""
 
 import sys
 from pathlib import Path
 
 import ngff_zarr as nz
 import numpy as np
-from common import dice, ncc, overlay
+from common import dice, ncc, overlay, scene_fields
 
 SCENE = sys.argv[1] if len(sys.argv) > 1 else "output/pair.ozx"
+LABELS = sys.argv[2:4]
+if not Path(SCENE).exists():
+    sys.exit(f"{SCENE}: no such scene")
 
 scene = nz.NgffScene.from_ome_zarr(SCENE)
 transformation = scene.coordinateTransformations[0]
-fixed = scene.images["fixed"].images[0]
-moving = scene.images["moving"].images[0]
-# A displacements field is an image of the scene, read by its path; an affine is in the scene's metadata already.
-path = getattr(transformation, "path", None)
-fields = {path: nz.from_ome_zarr(f"{SCENE}/{path}")} if path else None
-print(f"The scene holds an RFC-5 '{transformation.type}' from {transformation.input.path} to {transformation.output.path}")
+if transformation.type not in ("affine", "displacements"):
+    sys.exit(f"{SCENE}: holds a '{transformation.type}'; this step applies an affine or a displacements field")
+fixed = scene.images[transformation.input.path].images[0]
+moving = scene.images[transformation.output.path].images[0]
+fields = scene_fields(SCENE, transformation)
+print(
+    f"The scene holds an RFC-5 '{transformation.type}' from {transformation.input.path} to {transformation.output.path}"
+)
 
 # Lazy: this describes the result, block by block. Nothing is read or computed yet.
 moved = nz.resample(transformation, fixed, moving, fields=fields)
 
-# One plane is computed (a 2-D image is one), reading only the part of the moving image it needs.
+# One plane is computed (a 2-D image is one plane), reading only the part of the moving image it needs.
 plane = (fixed.data.shape[0] // 2,) if fixed.data.ndim == 3 else ()
 fixed_plane, moved_plane = np.asarray(fixed.data[plane]), np.asarray(moved.data[plane])
-overlay(fixed_plane, moved_plane, "output/after.png")
-print(f"Correlation with the fixed image, on one plane: {ncc(fixed_plane, np.asarray(moving.data[plane])):.2f} -> {ncc(fixed_plane, moved_plane):.2f}")
-print("After registration: output/after.png")
+after = Path(SCENE).parent / "after.png"
+overlay(fixed_plane, moved_plane, after)
+print(
+    f"Correlation with the fixed image, on one plane: {ncc(fixed_plane, np.asarray(moving.data[plane])):.2f} -> {ncc(fixed_plane, moved_plane):.2f}"
+)
+print(f"After registration: {after}")
 
-# The same transformation carries everything else on the moving side: the nuclei of step 1, on a scene of that pair.
-stores = {name: Path(f"output/{name}_nuclei.ome.zarr") for name in ("R0", "R1")}
-nuclei = {name: nz.from_ngff_zarr(str(store)).images[0] for name, store in stores.items() if store.exists()}
-if len(nuclei) == 2 and np.squeeze(nuclei["R0"].data).shape == fixed.data.shape:
-    carried = nz.resample(transformation, fixed, nuclei["R1"], interpolator="label_image", fields=fields)
-    before = dice(np.squeeze(nuclei["R0"].data), np.squeeze(nuclei["R1"].data))
-    after = dice(np.squeeze(nuclei["R0"].data), np.squeeze(carried.data))
-    print(f"Overlap of the nuclei (Dice): {before:.2f} -> {after:.2f}")
+# The same transformation carries everything else on the moving side, labels included, with their values kept.
+if LABELS:
+    labels_fixed, labels_moving = (nz.from_ngff_zarr(path).images[0] for path in LABELS)
+    carried = nz.resample(transformation, fixed, labels_moving, interpolator="label_image", fields=fields)
+    print(
+        f"Binary mask Dice of the labels: {dice(labels_fixed.data, labels_moving.data):.2f} -> {dice(labels_fixed.data, carried.data):.2f}"
+    )
