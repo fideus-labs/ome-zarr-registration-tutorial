@@ -11,6 +11,7 @@ from pathlib import Path
 import ngff_zarr as nz
 import numpy as np
 from common import dice, ncc, overlay, scene_fields
+from ngff_zarr.v06.zarr_metadata import Identity
 
 SCENE = sys.argv[1] if len(sys.argv) > 1 else "output/pair.ozx"
 LABELS = sys.argv[2:4]
@@ -30,15 +31,16 @@ print(
 
 # Lazy: this describes the result, block by block. Nothing is read or computed yet.
 moved = nz.resample(transformation, fixed, moving, fields=fields)
+# "Before" is the moving image on the fixed grid as the two sit in space: the identity, through the same call.
+unmoved = nz.resample(Identity(input=transformation.input, output=transformation.output), fixed, moving)
 
 # One plane is computed (a 2-D image is one plane), reading only the part of the moving image it needs.
 plane = (fixed.data.shape[0] // 2,) if fixed.data.ndim == 3 else ()
 fixed_plane, moved_plane = np.asarray(fixed.data[plane]), np.asarray(moved.data[plane])
 after = Path(SCENE).parent / "after.png"
 overlay(fixed_plane, moved_plane, after)
-print(
-    f"Correlation with the fixed image, on one plane: {ncc(fixed_plane, np.asarray(moving.data[plane])):.2f} -> {ncc(fixed_plane, moved_plane):.2f}"
-)
+before = ncc(fixed_plane, np.asarray(unmoved.data[plane]))
+print(f"Correlation with the fixed image, on one plane: {before:.2f} -> {ncc(fixed_plane, moved_plane):.2f}")
 print(f"After registration: {after}")
 
 # The same transformation carries everything else on the moving side, labels included, with their values kept.
