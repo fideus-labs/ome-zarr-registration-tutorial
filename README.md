@@ -19,7 +19,8 @@ By the end of this tutorial, you will have:
 1. **read** OME-Zarr images where they are, at the resolution you choose, or just a box of them;
 2. **registered** them with one command, on a laptop, without a GPU, with the transformation in OME-Zarr;
 3. **written** the images and that RFC-5 transformation in one OME-Zarr 0.6 file, with ngff-zarr, and read it back;
-4. **applied** it lazily to the image, to its labels and to points, without writing a resampled copy.
+4. **applied** it lazily to the image, to its labels and to points, without writing a resampled copy, and looked at
+   the result in napari, which reads the scene and places the images itself.
 
 It takes about 30 minutes, of which 3 of computing.
 
@@ -30,7 +31,7 @@ It takes about 30 minutes, of which 3 of computing.
 | **[1. Read](steps/1-read.ipynb)** | Opens the two rounds and reads what you choose, a resolution or a box; on your disk or on a server alike | ngff-zarr | `before.png`, `box.png` |
 | **[2. Register](steps/2-register.ipynb)** | Brings the moving image onto the fixed one, with one command | IMPACT-Reg | `Transform.ome.zarr`: an RFC-5 `affine`, twelve numbers |
 | **[3. Write, and read back](steps/3-write.ipynb)** | Puts both images and the transformation in one scene, and checks what a reader finds | ngff-zarr | `pair.ozx` |
-| **[4. Apply](steps/4-apply.ipynb)** | Applies it to the image, to the nuclei and to a point, lazily | ngff-zarr | nuclei mask Dice: 0 → 0.92 |
+| **[4. Apply](steps/4-apply.ipynb)** | Applies it to the image, to the nuclei and to a point, lazily, and opens the scene in napari | ngff-zarr, napari | nuclei mask Dice: 0 → 0.92 |
 
 One notebook per step, each with its outputs saved: you can read them here before running anything.
 
@@ -41,7 +42,7 @@ unchanged.
 
 ## Install
 
-Python 3.11 or newer. No GPU needed. Please install before the session: torch and the registration engines are large
+Python 3.12 or newer. No GPU needed. Please install before the session: torch and the registration engines are large
 downloads.
 
 With [uv](https://docs.astral.sh/uv/):
@@ -67,7 +68,8 @@ jupyter lab steps/1-read.ipynb
 ```
 
 Linux, Windows and macOS on Apple silicon: those are the machines the elastix binary of `Generic_Rigid` exists for.
-`ConvexAdam_Composite` has no macOS package, and the FireANTs presets want a GPU.
+`ConvexAdam_Composite` has no macOS package, and the FireANTs presets want a GPU. napari needs a desktop: on a remote
+machine without one, skip the last cell of step 4.
 
 ## The data
 

@@ -1,8 +1,9 @@
 """Step 4. Apply the transformation from the scene alone, lazily, without writing a resampled copy of the images.
 
-    python steps/apply.py SCENE.ozx [FIXED_LABELS MOVING_LABELS]
+    python steps/apply.py SCENE.ozx [FIXED_LABELS MOVING_LABELS] [--show]
 
 The labels are optional: two OME-Zarr label images on the two sides, carried through the same transformation.
+--show opens the scene in napari at the end, which places the moving image through the affine itself.
 """
 
 import sys
@@ -13,8 +14,10 @@ import numpy as np
 from common import dice, ncc, overlay, scene_fields
 from ngff_zarr.v06.zarr_metadata import Identity
 
-SCENE = sys.argv[1] if len(sys.argv) > 1 else "output/pair.ozx"
-LABELS = sys.argv[2:4]
+SHOW = "--show" in sys.argv
+arguments = [argument for argument in sys.argv[1:] if argument != "--show"]
+SCENE = arguments[0] if arguments else "output/pair.ozx"
+LABELS = arguments[1:3]
 if not Path(SCENE).exists():
     sys.exit(f"{SCENE}: no such scene")
 
@@ -50,3 +53,11 @@ if LABELS:
     print(
         f"Binary mask Dice of the labels: {dice(labels_fixed.data, labels_moving.data):.2f} -> {dice(labels_fixed.data, carried.data):.2f}"
     )
+
+# A viewer that reads RFC-5: napari-ome-zarr opens the scene folder and applies the affine itself (not a field yet).
+if SHOW:
+    import napari
+
+    viewer = napari.Viewer()
+    viewer.open(SCENE.removesuffix(".ozx") + ".ome.zarr", plugin="napari-ome-zarr")
+    napari.run()
