@@ -44,10 +44,23 @@ unchanged.
 Python 3.11 or newer. No GPU needed. Please install before the session: torch and the registration engines are large
 downloads.
 
+With [uv](https://docs.astral.sh/uv/):
+
 ```bash
 git clone https://github.com/fideus-labs/ome-zarr-registration-tutorial
 cd ome-zarr-registration-tutorial
-python -m venv .venv && source .venv/bin/activate
+uv venv --python 3.12
+uv pip install -r requirements.txt
+uv run python steps/get_data.py
+uv run jupyter lab steps/1-read.ipynb
+```
+
+With pip:
+
+```bash
+git clone https://github.com/fideus-labs/ome-zarr-registration-tutorial
+cd ome-zarr-registration-tutorial
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python steps/get_data.py
 jupyter lab steps/1-read.ipynb
