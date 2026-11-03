@@ -81,8 +81,10 @@ The same commands hold at any size.
 ## One file, and what the RFCs say
 
 - **RFC-5** gives OME-Zarr its coordinate systems and transformations: the `affine` and the `displacements` field of
-  this tutorial, and a scene that names what they connect. ngff-zarr reads and applies them today; other readers are
-  catching up, and [`tests/fixture/`](tests/fixture/) is a small scene to check one against.
+  this tutorial, and a scene that names what they connect. ngff-zarr reads and applies both today. napari-ome-zarr
+  0.11 opens the scene and shows the moving image through its `affine`, the two rounds aligned, but not yet through a
+  `displacements` field. Other readers are catching up, and [`tests/fixture/`](tests/fixture/) is a small scene to
+  check one against.
 - **RFC-9** is the `.ozx` form: the scene's store, zipped into one file. Readers support it to different degrees;
   ngff-zarr reads and writes it, and the unzipped store is the same thing.
 - **RFC-8**, collections, is a proposal: a scene could then refer to images that live elsewhere instead of copying
