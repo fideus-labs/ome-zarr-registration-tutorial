@@ -5,7 +5,6 @@
 The transformation is the one step 2 wrote: an RFC-5 ``affine`` or a ``displacements`` field, in OME-Zarr.
 """
 
-import shutil
 import sys
 from pathlib import Path
 
@@ -25,10 +24,8 @@ STORE = SCENE.removesuffix(".ozx") + ".ome.zarr"
 for path in (FIXED, MOVING, TRANSFORM):
     if not Path(path, "zarr.json").is_file():
         sys.exit(f"{path}: not an OME-Zarr store (no zarr.json in it)")
-if Path(STORE).exists():
-    if not OVERWRITE:
-        sys.exit(f"{STORE} exists: pass --overwrite to replace it")
-    shutil.rmtree(STORE)
+if Path(STORE).exists() and not OVERWRITE:
+    sys.exit(f"{STORE} exists: pass --overwrite to replace it")
 
 # An affine goes into the scene's metadata; a displacements field is copied below the scene, and pointed at.
 registration = scene_transformation(TRANSFORM, STORE)

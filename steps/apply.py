@@ -11,7 +11,7 @@ from pathlib import Path
 
 import ngff_zarr as nz
 import numpy as np
-from common import dice, ncc, overlay, scene_fields
+from common import dice, ncc, scene_fields, show
 from ngff_zarr.v06.zarr_metadata import Identity
 
 SHOW = "--show" in sys.argv
@@ -41,7 +41,7 @@ unmoved = nz.resample(Identity(input=transformation.input, output=transformation
 plane = (fixed.data.shape[0] // 2,) if fixed.data.ndim == 3 else ()
 fixed_plane, moved_plane = np.asarray(fixed.data[plane]), np.asarray(moved.data[plane])
 after = Path(SCENE).parent / "after.png"
-overlay(fixed_plane, moved_plane, after)
+show(fixed_plane, moved_plane, after)
 before = ncc(fixed_plane, np.asarray(unmoved.data[plane]))
 print(f"Correlation with the fixed image, on one plane: {before:.2f} -> {ncc(fixed_plane, moved_plane):.2f}")
 print(f"After registration: {after}")

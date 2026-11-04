@@ -28,7 +28,7 @@ It takes about 30 minutes, of which 3 of computing.
 
 | Step | What it does | With | You get |
 |---|---|---|---|
-| **[1. Read](steps/1-read.ipynb)** | Opens the two rounds and reads what you choose, a resolution or a box; on your disk or on a server alike | ngff-zarr | `before.png`, `box.png` |
+| **[1. Read](steps/1-read.ipynb)** | Opens the two rounds and reads what you choose, a resolution or a box; on your disk or on a server alike | ngff-zarr | the two rounds, seen |
 | **[2. Register](steps/2-register.ipynb)** | Brings the moving image onto the fixed one, with one command | IMPACT-Reg | `Transform.ome.zarr`: an RFC-5 `affine`, twelve numbers |
 | **[3. Write, and read back](steps/3-write.ipynb)** | Puts both images and the transformation in one scene, and checks what a reader finds | ngff-zarr | `pair.ozx` |
 | **[4. Apply](steps/4-apply.ipynb)** | Applies it to the image, to the nuclei and to a point, lazily, and opens the scene in napari | ngff-zarr, napari | nuclei mask Dice: 0 → 0.92 |
@@ -86,6 +86,9 @@ on larger images:
 
 - **[`demo/`](demo/README.md):** a mouse embryo, two time points read from a 9.3 TB public series;
 - **[Two mouse brains](media/videos/two-mouse-brains.mp4)** (video): up to 1.2 billion voxels on a laptop GPU.
+- **[`use-cases/`](use-cases/README.md):** the same four steps on real cases, one folder each. First one: two Allen
+  mouse-brain templates read from S3, reoriented from their RFC-4 orientations, registered rigidly and deformably,
+  applied at 10 µm, opened in 3D Slicer and napari.
 
 **[`tests/`](tests/test_rfc5.py)**: the RFC-5 round trips of steps 3 and 4 on synthetic images, with ngff-zarr alone,
 in 2-D and 3-D, for an affine and for a field; GitHub Actions runs them. **[`tests/fixture/`](tests/fixture/)** holds

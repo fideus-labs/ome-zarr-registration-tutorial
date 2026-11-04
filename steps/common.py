@@ -1,8 +1,9 @@
-"""What the steps share: where the data is, the picture, the two measures, and the two moves of a transformation
-into and out of a scene."""
+"""What the steps share: where the data is, a picture of two planes, two measures, and the two moves of a
+transformation into and out of a scene."""
 
 import json
 import os
+import shutil
 from pathlib import Path
 
 import ngff_zarr as nz
@@ -19,11 +20,12 @@ FIELD = "coordinateTransformations/registration"
 
 
 def scene_transformation(transform, store):
-    """The RFC-5 transformation step 2 wrote at ``transform``, ready for a scene at ``store``.
+    """The RFC-5 transformation step 2 wrote at ``transform``, ready for a fresh scene at ``store``.
 
     An affine is metadata alone: it is read as it is. A displacements field is an image of vectors: it is copied
     below the scene first, and the scene points at it by its path (ngff-zarr writes a scene in that order).
     """
+    shutil.rmtree(store, ignore_errors=True)
     with open(f"{transform}/zarr.json", encoding="utf-8") as file:
         ome = json.load(file)["attributes"]["ome"]
     if "multiscales" not in ome:
@@ -42,15 +44,21 @@ def scene_fields(scene, transformation):
 
 
 def _scaled(plane):
+    plane = np.asarray(plane, float)
     low, high = np.percentile(plane, (1, 99.8))
     return np.clip((plane - low) / max(high - low, 1e-6), 0, 1)
 
 
-def overlay(fixed, moving, path):
-    """Fixed in green, moving in magenta: where they agree, the picture turns white."""
-    green, magenta = _scaled(np.asarray(fixed, float)), _scaled(np.asarray(moving, float))
-    rgb = np.stack([magenta, green, magenta], axis=-1)
-    Image.fromarray((rgb * 255).astype(np.uint8)).save(path)
+def show(fixed, moving, path=None):
+    """The two planes in one picture, fixed in green, moving in magenta: where they agree, it turns white.
+
+    Returns the picture, which a notebook displays as the cell's last line; ``path`` also saves it.
+    """
+    green, magenta = _scaled(fixed), _scaled(moving)
+    picture = Image.fromarray((np.stack([magenta, green, magenta], axis=-1) * 255).astype(np.uint8))
+    if path:
+        picture.save(path)
+    return picture
 
 
 def ncc(fixed, moving):

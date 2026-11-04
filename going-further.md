@@ -77,6 +77,8 @@ The same commands hold at any size.
   minutes on a GPU.
 - **[Two mouse brains](media/videos/two-mouse-brains.mp4) (video):** ExaSPIM light-sheet, in OME-Zarr, up to 1.2 billion
   voxels on a laptop GPU.
+- **[`use-cases/`](use-cases/README.md):** real cases, one folder each, with their scripts and figures; the first is the Allen
+  CCF and SmartSPIM templates, from S3 to 3D Slicer.
 
 ## One file, and what the RFCs say
 
