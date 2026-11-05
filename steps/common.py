@@ -37,10 +37,25 @@ def scene_transformation(transform, store):
 def scene_fields(scene, transformation):
     """What ``nz.resample`` needs beside the transformation: a displacements field, read from the scene by its path.
 
-    An affine needs nothing: the scene's metadata holds it whole.
+    An affine needs nothing: ngff-zarr reads its matrix with the scene, inline or from the array its own path names.
     """
-    path = getattr(transformation, "path", None)
+    path = transformation.path if transformation.type == "displacements" else None
     return {path: nz.from_ome_zarr(f"{scene}/{path}")} if path else None
+
+
+def view(fixed, moved):
+    """The fixed image in green and the moved one in magenta, in napari. ``moved`` can stay lazy: napari computes only
+    the plane on screen, so this works for an affine and for a displacements field."""
+    import napari
+
+    viewer = napari.Viewer()
+    middle = (fixed.data.shape[0] // 2,) if fixed.data.ndim == 3 else ()
+    for image, colormap in ((fixed, "green"), (moved, "magenta")):
+        limits = np.percentile(np.asarray(image.data[middle]), (1, 99.8))
+        viewer.add_image(
+            image.data, scale=list(image.scale.values()), colormap=colormap, blending="additive", contrast_limits=limits
+        )
+    return viewer
 
 
 def _scaled(plane):

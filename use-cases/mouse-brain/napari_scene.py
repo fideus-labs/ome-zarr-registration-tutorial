@@ -1,31 +1,25 @@
-"""Open an OME-Zarr 0.6 scene with napari-ome-zarr, list what napari got, save a screenshot, and stay open with --keep.
+"""Show an OME-Zarr 0.6 scene in napari: the fixed image, and the moving one resampled lazily through the scene's
+transformation. Saves a screenshot, and stays open with --keep.
 
-python napari_scene.py SCENE_DIR OUT.png [--keep]
+python napari_scene.py SCENE OUT.png [--keep]
 """
 
 import sys
+from pathlib import Path
 
 import napari
-import numpy as np
+import ngff_zarr as nz
 from qtpy.QtWidgets import QApplication
 
-scene, out = sys.argv[1], sys.argv[2]
-viewer = napari.Viewer(show=True, title=f"napari-ome-zarr: {scene}")
-layers = viewer.open(scene, plugin="napari-ome-zarr")
-print(f"{len(layers)} layer(s):")
-for layer in layers:
-    data = layer.data[0] if isinstance(layer.data, list) else layer.data
-    print(
-        f"  {layer.name}: {type(layer).__name__} shape {data.shape} scale {np.round(layer.scale, 4).tolist()} translate {np.round(layer.translate, 3).tolist()}"
-    )
-    print(f"    affine:\n{np.array2string(np.asarray(layer.affine.affine_matrix), precision=3, suppress_small=True)}")
-if len(viewer.layers) >= 2:
-    viewer.layers[0].colormap = "green"
-    viewer.layers[1].colormap = "magenta"
-    for layer in viewer.layers:
-        layer.blending = "additive"
-if viewer.dims.ndim >= 3:
-    viewer.dims.set_point(0, (viewer.dims.range[0][0] + viewer.dims.range[0][1]) / 2)
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "steps"))  # the tutorial's common.py
+from common import scene_fields, view  # noqa: E402
+
+scene_path, out = sys.argv[1], sys.argv[2]
+scene = nz.NgffScene.from_ome_zarr(scene_path)
+T = scene.coordinateTransformations[0]
+fixed = scene.images[T.input.path].images[0]
+moved = nz.resample(T, fixed, scene.images[T.output.path].images[0], fields=scene_fields(scene_path, T))
+viewer = view(fixed, moved)
 viewer.reset_view()
 for _ in range(20):
     QApplication.processEvents()

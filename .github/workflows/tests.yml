@@ -11,5 +11,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install "ngff-zarr[itk,validate]>=0.51" pillow pytest
+      - run: pip install "ngff-zarr[itk,validate]>=0.52" pillow pytest
       - run: pytest -q tests

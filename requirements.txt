@@ -3,10 +3,9 @@ impact-reg-konfai>=1.8.8
 # ConvexAdam's itk-impact is built against this torch; it has no wheel for macOS
 torch==2.12.*; sys_platform != "darwin"
 # Reading, writing and applying OME-Zarr transformations; remote: the data, read over HTTP where it is
-ngff-zarr[itk,remote]>=0.51
-# Looking at the result: napari opens the scene and applies its affine itself (napari-ome-zarr 0.11 reads OME-Zarr 0.6)
+ngff-zarr[itk,remote]>=0.52
+# Looking at the result
 napari[pyqt6]
-napari-ome-zarr>=0.11
 # The pictures
 pillow
 # The notebooks

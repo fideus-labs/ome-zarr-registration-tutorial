@@ -18,3 +18,10 @@ python steps/write.py "$F" "$M" $OUT/registration/P000/Transform.ome.zarr $OUT/p
 
 # 4. Apply: one plane, computed from the scene; nothing else is written
 python steps/apply.py $OUT/pair.ozx
+
+# 5. Look: in 3D Slicer, with the SlicerOMEZarr extension (SLICER=/path/to/Slicer bash demo/run.sh), or drag the scene onto it
+if [ -n "${SLICER-}" ]; then
+    "$SLICER" --python-code "slicer.util.loadNodeFromFile('$PWD/$OUT/pair.ome.zarr', 'OMEZarr')"
+else
+    echo "To see it in 3D Slicer, with the SlicerOMEZarr extension: drag $OUT/pair.ome.zarr onto Slicer"
+fi

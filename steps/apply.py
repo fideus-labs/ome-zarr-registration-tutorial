@@ -3,7 +3,7 @@
     python steps/apply.py SCENE.ozx [FIXED_LABELS MOVING_LABELS] [--show]
 
 The labels are optional: two OME-Zarr label images on the two sides, carried through the same transformation.
---show opens the scene in napari at the end, which places the moving image through the affine itself.
+--show opens the fixed and moved images in napari at the end.
 """
 
 import sys
@@ -11,7 +11,7 @@ from pathlib import Path
 
 import ngff_zarr as nz
 import numpy as np
-from common import dice, ncc, scene_fields, show
+from common import dice, ncc, scene_fields, show, view
 from ngff_zarr.v06.zarr_metadata import Identity
 
 SHOW = "--show" in sys.argv
@@ -54,10 +54,9 @@ if LABELS:
         f"Binary mask Dice of the labels: {dice(labels_fixed.data, labels_moving.data):.2f} -> {dice(labels_fixed.data, carried.data):.2f}"
     )
 
-# A viewer that reads RFC-5: napari-ome-zarr opens the scene folder and applies the affine itself (not a field yet).
+# napari computes only the plane on screen of the lazy moved image, for an affine or a field.
 if SHOW:
     import napari
 
-    viewer = napari.Viewer()
-    viewer.open(SCENE.removesuffix(".ozx") + ".ome.zarr", plugin="napari-ome-zarr")
+    view(fixed, moved)
     napari.run()

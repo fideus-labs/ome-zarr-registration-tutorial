@@ -7,6 +7,7 @@ still open. The scene is always written and applied with the tutorial's own `ste
 | Case | Data | What it shows |
 |---|---|---|
 | [`mouse-brain/`](mouse-brain/README.md) | Allen CCF (STPT) and SmartSPIM templates, 10 µm, on S3; an ExaSPIM whole-head template | anonymous S3 reads, reorientation from RFC-4 orientations without interpolation, rigid against deformable, the field applied at 10 µm, the scene in 3D Slicer and napari |
+| [`human-hemisphere/`](human-hemisphere/README.md) | A 7 T MRI of a human hemisphere and its 976 GB synchrotron scan at 20 µm, on DANDI's S3 | a small cube filled from the huge scan through an affine and a B-spline, reading 0.24 GB of it; how ngff-zarr bounds each block's read |
 
 ## Adding a case
 

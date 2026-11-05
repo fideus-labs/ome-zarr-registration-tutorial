@@ -75,7 +75,8 @@ python use-cases/mouse-brain/napari_scene.py use-cases/mouse-brain/output/rigid.
 
 With the SlicerOMEZarr extension, `rigid.ome.zarr` and `fireants.ome.zarr` also open as scenes: the fixed image stays,
 the moving one hangs under the transformation, a linear transform for the affine and a grid transform for the field,
-applied as stored. napari-ome-zarr 0.11 opens the affine scene the same way; a displacements field is not in it yet.
+applied as stored. `napari_scene.py` shows a scene in napari, the moving image resampled lazily by ngff-zarr,
+for the affine and the field alike.
 
 A detail on frames: ngff-zarr's RFC-4 helper knows the six human orientations only, and `dorsal-to-ventral` is not one
 of them, so SlicerOMEZarr falls back to its assumed orientation, identity direction, for these stores. That is the frame
@@ -92,7 +93,7 @@ labels do not mean the mouse's axes here.
   middle planes, one per preset.
 - `figures/fireants_10um_coronal.png`: the FireANTs field applied at 10 µm on the S3 stores.
 - `figures/slicer_before_red.png`, `slicer_after_*.png`: 3D Slicer, the FireANTs transformation applied in Slicer.
-- `figures/napari_rigid.png`: napari-ome-zarr 0.11 opening `rigid.ome.zarr`, the affine applied by napari.
+- `figures/napari_rigid.png`, `napari_fireants.png`: `rigid.ome.zarr` and `fireants.ome.zarr` in napari.
 - `figures/exaspim_axes_mid_*.png`, `exaspim_rigid_planes.png`: the ExaSPIM template on the CCF's axes, and its rigid
   onto the CCF.
 
