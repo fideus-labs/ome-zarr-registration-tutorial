@@ -16,6 +16,13 @@ block lands in the scan, then reads only the chunks inside that bound.
 | Read | 466 of 1.9 million chunks: 0.24 GB of the 976 GB scan |
 | Time | 18 s for the cube |
 
+| The cube, chosen in the MRI | Where it lands in the scan |
+|---|---|
+| <img src="figures/cube_in_mri.png" width="400" alt="A sagittal MRI plane of the hemisphere, the 8 mm cube outlined in red, and the cube cut into output blocks"> | <img src="figures/chunks_read.png" width="400" alt="The scan around the cube: where the cube lands in red, its bound dashed, the chunks read in yellow"> |
+
+On the right: where the cube lands in the scan (red), the bound ngff-zarr computes before reading (dashed), and the
+chunks it reads (yellow). The rest of the scan is never read.
+
 ```bash
 pip install matplotlib   # on top of the tutorial's requirements
 jupyter lab use-cases/human-hemisphere/resample.ipynb
