@@ -1,4 +1,4 @@
-"""Where transform_bspline.h5 comes from: python make_bspline.py
+"""Where bspline.h5 and sform.h5 come from: python make_bspline.py
 
 The registration only has to give a credible B-spline; the notebook is about the resample.
 
@@ -6,7 +6,7 @@ The registration only has to give a credible B-spline; the notebook is about the
 2. IMPACT-Reg's elastix B-spline between them (Elastix_IMPACT_Static, control points every 30 voxels, about 3 min
    on a CPU), which writes its result as a displacement field.
 3. That field fitted with a cubic ITK BSplineTransform, control points every 30 mm, by separable least squares
-   (within 0.2 mm of the field, median), and composed after the sform: transform_bspline.h5.
+   (within 0.2 mm of the field, median): bspline.h5, applied before sform.h5, the MRI's sform.
 """
 
 import subprocess
@@ -89,8 +89,6 @@ bspline = itk.BSplineTransform[itk.D, 3, 3].New()
 bspline.SetFixedParameters(parameters([*grid_size, *grid_origin, *spacing, *np.eye(3).ravel()]))
 bspline.SetParameters(parameters([v for d in range(3) for v in coefficients[..., d].ravel()]))  # x fastest; x, y, z
 
-transform = itk.CompositeTransform[itk.D, 3].New()
-transform.AddTransform(sform())
-transform.AddTransform(bspline)  # applied first: MRI point -> B-spline -> sform -> synchrotron point
-itk.transformwrite([transform], "transform_bspline.h5")
-print(f"transform_bspline.h5: the sform, then a B-spline of {bspline.GetNumberOfParameters()} parameters")
+itk.transformwrite([bspline], "bspline.h5")
+itk.transformwrite([sform()], "sform.h5")
+print(f"bspline.h5: {bspline.GetNumberOfParameters()} parameters, applied before sform.h5")

@@ -21,10 +21,24 @@ pip install matplotlib   # beside the tutorial's requirements
 jupyter lab use-cases/human-hemisphere/resample.ipynb
 ```
 
+The same in one command, [steps/resample.py](../../steps/resample.py): two images and a sequence of ITK transforms,
+applied in the order given, from the fixed image's points to the moving image's. The fixed image is a cube cut out of
+the MRI; `--spacing` fills it at the scan's 20 µm.
+
+```bash
+cd use-cases/human-hemisphere
+python crop_mri.py 36.0 46.4 92.4 8 output/mri_cube.ome.zarr    # centre (z, y, x) and size, mm
+python ../../steps/resample.py output/mri_cube.ome.zarr s3://dandiarchive/zarr/6f11427f-ef86-42b8-9800-d3e09265c965 \
+    bspline.h5 sform.h5 -o output/cube.ome.zarr --spacing 0.02007 \
+    --storage-options '{"skip_signature": true, "region": "us-east-2"}'
+```
+
 - [`hemisphere.py`](hemisphere.py): the two images as lazy NgffImages in millimeters, the MRI's sform as an ITK affine,
   and the notebook's figures.
-- [`transform_bspline.h5`](transform_bspline.h5): the transformation, 19 kB. The MRI's sform (LINC's affine into the
-  synchrotron's frame), then a cubic B-spline with control points every 30 mm.
+- [`bspline.h5`](bspline.h5), [`sform.h5`](sform.h5): the transformation, in two ITK files applied in that order. A
+  cubic B-spline with control points every 30 mm (19 kB), then the MRI's sform, LINC's affine into the synchrotron's
+  frame.
+- [`crop_mri.py`](crop_mri.py): a cube of the MRI as a small local OME-Zarr, the fixed image of the command.
 - [`make_bspline.py`](make_bspline.py): where the B-spline comes from. IMPACT-Reg's `Elastix_IMPACT_Static` on the MRI
   and the sform-placed scan at 1 mm (`final_grid_spacing=30`, about 3 min on a CPU), its field then fitted with a cubic
   ITK `BSplineTransform` (within 0.2 mm of it, median).

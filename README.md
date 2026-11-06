@@ -35,6 +35,13 @@ It takes about 30 minutes, of which 3 of computing.
 
 One notebook per step, each with its outputs saved: you can read them here before running anything.
 
+To resample a whole moving image onto a fixed one through ITK transforms (an affine, a B-spline, several in a row),
+[`steps/resample.py`](steps/resample.py) is one command; it reads only what the fixed grid needs:
+
+```bash
+python steps/resample.py FIXED.ome.zarr MOVING.ome.zarr first.h5 second.h5 -o moved.ome.zarr
+```
+
 **In 3D Slicer.** Install or update the [SlicerOMEZarr](https://github.com/fideus-labs/SlicerOMEZarr) extension in the
 Extensions Manager, then drag `output/pair.ome.zarr` onto Slicer. You get the two images and the transformation as a
 transform node: a linear transform for an affine, a grid transform for a displacement field. Slicer needs ngff-zarr 0.52
