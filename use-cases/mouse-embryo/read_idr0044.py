@@ -1,6 +1,6 @@
 """One time point and channel of idr0044, read over HTTP, into a local OME-Zarr store with its true geometry.
 
-python demo/read_idr0044.py TIME LEVEL OUTPUT.ome.zarr
+python use-cases/mouse-embryo/read_idr0044.py TIME LEVEL OUTPUT.ome.zarr
 """
 
 import sys

@@ -72,7 +72,7 @@ level = max([0] + [i for i, image in enumerate(pyramid) if max(in_mm(image).scal
 moving = in_mm(pyramid[level])
 print(
     f"{fixed.data.shape} voxels at {spacing * 1000:.2f} um, read from moving level {level} "
-    f"({max(moving.scale.values()) * 1000:.2f} um), through {len(args.transforms)} transform(s)"
+    f"({min(moving.scale.values()) * 1000:.2f} um), through {len(args.transforms)} transform(s)"
 )
 
 moved = nz.resample(transform, fixed, moving)
